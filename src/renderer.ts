@@ -1,5 +1,8 @@
 /**
  * Mermaid rendering using the actual mermaid-vibes NPM package
+ *
+ * Browser assets (JS bundle + CSS) are pre-built at build time by
+ * scripts/bundle.mjs and live alongside this file in dist/.
  */
 
 import * as fs from 'fs/promises';
@@ -7,7 +10,6 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import puppeteer from 'puppeteer';
-import { execSync } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -16,34 +18,21 @@ let bundleCache: string | null = null;
 let cssBundleCache: string | null = null;
 
 /**
- * Build the browser bundle using esbuild (cached across renders)
+ * Read the pre-built browser bundle (cached across renders)
  */
 async function getBrowserBundle(): Promise<string> {
   if (bundleCache) return bundleCache;
-
-  const entryPoint = path.join(__dirname, '..', 'src', 'browser-entry.tsx');
-  const outfile = path.join(__dirname, '..', '.tmp', 'browser-bundle.js');
-
-  await fs.mkdir(path.join(__dirname, '..', '.tmp'), { recursive: true });
-
-  const esbuildBin = path.join(__dirname, '..', 'node_modules', '.bin', 'esbuild');
-
-  execSync(
-    `${esbuildBin} ${entryPoint} --bundle --outfile=${outfile} --format=iife --platform=browser --target=es2020 --loader:.tsx=tsx --jsx=automatic`,
-    { cwd: path.join(__dirname, '..') }
-  );
-
-  bundleCache = await fs.readFile(outfile, 'utf-8');
+  const bundlePath = path.join(__dirname, 'browser-bundle.js');
+  bundleCache = await fs.readFile(bundlePath, 'utf-8');
   return bundleCache;
 }
 
 /**
- * Get the mermaid-vibes CSS (cached)
+ * Read the pre-built mermaid-vibes CSS (cached)
  */
 async function getMermaidVibesCSS(): Promise<string> {
   if (cssBundleCache) return cssBundleCache;
-
-  const cssPath = path.join(__dirname, '..', 'node_modules', 'mermaid-vibes', 'dist', 'index.css');
+  const cssPath = path.join(__dirname, 'mermaid-vibes.css');
   cssBundleCache = await fs.readFile(cssPath, 'utf-8');
   return cssBundleCache;
 }
