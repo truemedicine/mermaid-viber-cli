@@ -22,6 +22,14 @@
   ],
   "author": "Truemed",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/truemedicine/mermaid-viber-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/truemedicine/mermaid-viber-cli/issues"
+  },
+  "homepage": "https://github.com/truemedicine/mermaid-viber-cli#readme",
   "dependencies": {
     "commander": "^12.1.0",
     "mermaid-vibes": "^1.4.2",
